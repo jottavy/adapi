@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: laremise
+    environment:
+      POSTGRES_USER: laremise
+      POSTGRES_PASSWORD: laremise
+      POSTGRES_DB: laremise_db
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:

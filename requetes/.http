@@ -1,0 +1,15 @@
+# ---------------------------------------------
+# OBJETS
+# ---------------------------------------------
+
+### Tous les objets sans filtre
+GET http://localhost:3000/api/objets
+
+### Uniquement les objets arrivés
+GET http://localhost:3000/api/objets?statut=arrive
+
+### Uniquement la catégorie 4
+GET http://localhost:3000/api/objets?categorie_id=4
+
+### Chercher tous les objets contenant "plaid" (trouve "Plaid polaire", "PLAID", etc.)
+GET http://localhost:3000/api/objets?libelle=plaid
