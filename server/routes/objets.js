@@ -1,57 +1,75 @@
 import { Router } from 'express';
 import pool from '../db.js';
 
-const router = Router();
+const objetsRouter = Router();
 
-// GET /api/objets (Tous les objets + Filtres optionnels)
-router.get('/', async (req, res) => {
-  try {
-    const { statut, categorie_id, libelle } = req.query;
+// La liste des objets, avec le libellé de leur catégorie
+// objetsRouter.get("/", async (req, res) => {
+//     try {
+//         const result = await pool.query(`
+//           SELECT
+//           objet.*, categorie.libelle
+//           FROM objet
+//           JOIN categorie ON objet.categorie_id = categorie.id
+//           `);
+//         res.json(result.rows)
+//           } catch (err) {
+//         console.error("Erreur GET api/objets : ", err.message)
+//         res.status(500).json({ error: err.message })
+//     }
+// });
 
-    let query = 'SELECT * FROM objet WHERE 1=1';
-    const values = [];
+// La même liste, filtrée — les deux filtres sont optionnels et cumulables
+objetsRouter.get("/", async (req, res) => {
+    try {
+        const result = await pool.query(`
+          SELECT
+          objet.*, categorie.libelle
+          FROM objet
+          JOIN categorie ON objet.categorie_id = categorie.id
+          WHERE objet.statut = COALESCE($1::statut_objet, objet.statut)
+          AND objet.categorie_id = COALESCE($2::integer, objet.categorie_id)
+          ORDER BY objet.id ASC
+          `, [req.query.statut || null, req.query.categorie_id || null]
+        );
 
-    if (statut) {
-      values.push(statut);
-      query += ` AND statut = $${values.length}`;
-    }
+        res.json(result.rows);
 
-    if (categorie_id) {
-      values.push(categorie_id);
-      query += ` AND categorie_id = $${values.length}`;
-    }
-
-    if (libelle) {
-      values.push(`%${libelle}%`);
-      query += ` AND libelle ILIKE $${values.length}`;
-    }
-
-    query += ' ORDER BY id ASC;';
-
-    const result = await pool.query(query, values);
-    res.json(result.rows);
-  } catch (err) {
-    console.error('Erreur GET /api/objets :', err.message);
-    res.status(500).json({ error: err.message });
-  }
+        } catch (err) {
+            console.error("Erreur GET api/objets : ", err.message)
+            res.status(500).json({ error: err.message })
+        }
 });
 
-// GET /api/objets/:id (Un seul objet par son ID)
-router.get('/:id', async (req, res) => {
-  const { id } = req.params;
+// Un objet, sa catégorie, son dépôt et le nom de sa donatrice
+objetsRouter.get("/:id", async (req, res) => {
+    try {
+        const result = await pool.query(`
+          SELECT
+          objet.*,
+          categorie.libelle AS categorie_libelle,
+          depot.type AS depot_type,
+          personne.nom AS personne_nom,
+          personne.prenom AS personne_prenom
+          FROM objet
+          JOIN categorie ON objet.categorie_id = categorie.id
+          JOIN depot ON objet.depot_id = depot.id
+          JOIN personne ON depot.personne_id = personne.id
+          WHERE objet.id = $1;
+          `, [req.params.id]
+        );
 
-  try {
-    const result = await pool.query('SELECT * FROM objet WHERE id = $1;', [id]);
+        if (result.rows.length === 0) {
+            return res.status(404).json({ error: "Objet non trouvé" });
+        }
 
-    if (result.rows.length === 0) {
-      return res.status(404).json({ error: 'Objet non trouvé' });
-    }
+        res.json(result.rows[0]);
 
-    res.json(result.rows[0]);
-  } catch (err) {
-    console.error(`Erreur GET /api/objets/${id} :`, err.message);
-    res.status(500).json({ error: err.message });
-  }
+        } catch (err) {
+            console.error("Erreur GET api/objets/:id : ", err.message)
+            res.status(500).json({ error: err.message })
+        }
 });
 
-export default router;
+
+export default objetsRouter;
