@@ -3,6 +3,10 @@ import pool from '../db.js';
 
 const objetsRouter = Router();
 
+// --------------------------------------------------
+// GET
+// --------------------------------------------------
+
 // La liste des objets, avec le libellé de leur catégorie
 // objetsRouter.get("/", async (req, res) => {
 //     try {
