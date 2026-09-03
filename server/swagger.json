@@ -3,20 +3,259 @@
   "info": {
     "title": "API La Remise",
     "version": "1.0.0",
-    "description": "API de gestion de la ressourcerie La Remise"
+    "description": "API REST de gestion des objets, dépôts, personnes, catégories et statistiques pour la remise."
   },
+  "servers": [
+    {
+      "url": "http://localhost:3000",
+      "description": "Serveur local"
+    }
+  ],
   "paths": {
-    "/objets": {
+    "/api/categories": {
       "get": {
-        "summary": "Liste tous les objets",
+        "summary": "Toutes les catégories",
+        "tags": ["Catégories"],
         "responses": {
-          "200": { "description": "" }
+          "200": {
+            "description": "Liste de toutes les catégories triées par ID"
+          },
+          "500": { "description": "Erreur serveur" }
         }
       },
-       "get": {
-        "summary": "Liste tous les objets",
+      "post": {
+        "summary": "Créer une catégorie",
+        "tags": ["Catégories"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["libelle"],
+                "properties": {
+                  "libelle": { "type": "string", "example": "Vêtements" }
+                }
+              }
+            }
+          }
+        },
         "responses": {
-          "200": { "description": "La liste des objets" }
+          "201": { "description": "Catégorie créée avec succès" },
+          "400": { "description": "Le libellé est obligatoire" },
+          "500": { "description": "Erreur serveur" }
+        }
+      }
+    },
+    "/api/objets": {
+      "get": {
+        "summary": "Liste des objets (filtrable)",
+        "tags": ["Objets"],
+        "parameters": [
+          {
+            "name": "statut",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["arrive", "en_reparation", "en_rayon", "vendu", "recycle"]
+            },
+            "description": "Filtrer par statut d'objet"
+          },
+          {
+            "name": "categorie_id",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "integer" },
+            "description": "Filtrer par identifiant de catégorie"
+          }
+        ],
+        "responses": {
+          "200": { "description": "Liste des objets récupérée avec succès" },
+          "500": { "description": "Erreur serveur" }
+        }
+      }
+    },
+    "/api/objets/:id": {
+      "get": {
+        "summary": "Détails d'un objet",
+        "tags": ["Objets"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Objet trouvé avec sa catégorie, son dépôt et la donatrice" },
+          "404": { "description": "Objet non trouvé" },
+          "500": { "description": "Erreur serveur" }
+        }
+      }
+    },
+    "/api/objets/:id/statut": {
+      "patch": {
+        "summary": "Faire évoluer le statut et le prix d'un objet",
+        "tags": ["Objets"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["statut", "prix"],
+                "properties": {
+                  "statut": {
+                    "type": "string",
+                    "enum": ["arrive", "en_reparation", "en_rayon", "vendu", "recycle"],
+                    "example": "en_rayon"
+                  },
+                  "prix": { "type": "number", "example": 15 }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Statut et prix de l'objet mis à jour" },
+          "400": { "description": "Le statut et le prix sont obligatoires" },
+          "404": { "description": "Objet non trouvé" },
+          "500": { "description": "Erreur serveur" }
+        }
+      }
+    },
+    "/api/personnes": {
+      "post": {
+        "summary": "Créer une personne / donatrice",
+        "tags": ["Personnes"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["nom", "prenom"],
+                "properties": {
+                  "nom": { "type": "string", "example": "Benali" },
+                  "prenom": { "type": "string", "example": "Yanis" },
+                  "telephone": { "type": "string", "example": "0660172721" },
+                  "adherente": { "type": "boolean", "example": true }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Personne créée avec succès" },
+          "400": { "description": "Le nom et le prénom sont obligatoires" },
+          "500": { "description": "Erreur serveur" }
+        }
+      }
+    },
+    "/api/depots": {
+      "post": {
+        "summary": "Enregistrer un nouveau dépôt",
+        "tags": ["Dépôts"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["personne_id", "type"],
+                "properties": {
+                  "personne_id": { "type": "integer", "example": 3 },
+                  "type": { "type": "string", "example": "boutique" },
+                  "date_depot": { "type": "string", "format": "date", "example": "2026-10-15" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Dépôt créé avec succès" },
+          "400": { "description": "L'identifiant de la personne et le type sont obligatoires" },
+          "500": { "description": "Erreur serveur" }
+        }
+      }
+    },
+    "/api/depots/:id": {
+      "get": {
+        "summary": "Détails d'un dépôt avec donatrice et objets",
+        "tags": ["Dépôts"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Dépôt récupéré avec la liste des objets" },
+          "404": { "description": "Dépôt non trouvé" },
+          "500": { "description": "Erreur serveur" }
+        }
+      }
+    },
+    "/api/depots/:id/objets": {
+      "post": {
+        "summary": "Ajouter un objet à un dépôt",
+        "tags": ["Dépôts"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["libelle", "categorie_id"],
+                "properties": {
+                  "libelle": { "type": "string", "example": "Veste en jean" },
+                  "poids_kg": { "type": "number", "example": 0.8 },
+                  "etat_arrivee": {
+                    "type": "string",
+                    "enum": ["bon_etat", "a_reparer", "hors_service"],
+                    "example": "bon_etat"
+                  },
+                  "categorie_id": { "type": "integer", "example": 2 }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Objet ajouté au dépôt" },
+          "400": { "description": "Champs obligatoires manquants ou état d'arrivée invalide" },
+          "404": { "description": "Le dépôt ou la catégorie n'existe pas" },
+          "500": { "description": "Erreur serveur" }
+        }
+      }
+    },
+    "/api/stats": {
+      "get": {
+        "summary": "Statistiques groupées par statut",
+        "tags": ["Statistiques"],
+        "responses": {
+          "200": { "description": "Nombre d'objets et poids total calculés par statut" },
+          "500": { "description": "Erreur serveur" }
         }
       }
     }
