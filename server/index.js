@@ -1,6 +1,7 @@
 import swaggerUi from "swagger-ui-express";
 import swaggerDocument from "./swagger.json" with { type: "json" };
 import express from "express";
+import cors from "cors"
 import objetsRouter from './routes/objets.js';
 import categoriesRouter from './routes/categories.js';
 import depotsRouter from './routes/depots.js';
@@ -9,6 +10,7 @@ import statsRouter from './routes/stats.js';
 
 const app = express();
 
+app.use(cors());
 app.use(express.json());
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));

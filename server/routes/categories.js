@@ -19,29 +19,5 @@ categoriesRouter.get("/", async (req, res) => {
     }
 });
 
-// --------------------------------------------------
-// POST
-// --------------------------------------------------
-
-categoriesRouter.post("/", async (req, res) => {
-    const { libelle } = req.body;
-
-    if (!libelle) {
-        return res.status(400).json({ error: "Le libellé n'existe pas." });
-    }
-
-    try {
-        const result = await pool.query(`
-            INSERT INTO categorie (libelle)
-            VALUES ($1)
-            RETURNING *;
-        `, [libelle]);
-
-        res.status(201).json(result.rows[0]);
-  
-    } catch (err) {
-        next(err);
-    }
-});
 
 export default categoriesRouter;

@@ -22,29 +22,6 @@
           },
           "500": { "description": "Erreur serveur" }
         }
-      },
-      "post": {
-        "summary": "Créer une catégorie",
-        "tags": ["Catégories"],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": ["libelle"],
-                "properties": {
-                  "libelle": { "type": "string", "example": "Vêtements" }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": { "description": "Catégorie créée avec succès" },
-          "400": { "description": "Le libellé est obligatoire" },
-          "500": { "description": "Erreur serveur" }
-        }
       }
     },
     "/api/objets": {
