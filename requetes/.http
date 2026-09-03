@@ -41,9 +41,9 @@ POST http://localhost:3000/api/personnes
 Content-Type: application/json
 
 {
-  "nom": "Benali",
-  "prenom": "Yanis",
-  "telephone": "0660172721",
+  "nom": "Lio",
+  "prenom": "Jean-Paul",
+  "telephone": "0667888890",
   "adherente": true
 }
 

@@ -15,8 +15,7 @@ categoriesRouter.get("/", async (req, res) => {
         `);
         res.json(result.rows);
     } catch (err) {
-        console.error("Erreur GET api/categories : ", err.message)
-        res.status(500).json({ error: err.message })
+        next(err);
     }
 });
 
@@ -41,8 +40,7 @@ categoriesRouter.post("/", async (req, res) => {
         res.status(201).json(result.rows[0]);
   
     } catch (err) {
-        console.error("Erreur POST /api/categories :", err.message);
-        res.status(500).json({ error: err.message });
+        next(err);
     }
 });
 

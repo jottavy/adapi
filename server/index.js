@@ -19,11 +19,17 @@ app.use('/api/depots', depotsRouter);
 app.use('/api/personnes', personnesRouter);
 app.use('/api/stats', statsRouter);
 
-app.listen(3000, () => {
-  console.log(`🚀 Serveur Express démarré sur http://localhost:3000`);
+app.use((err, req, res, next) => {
+  console.error("Erreur centralisée :", err.stack);
+
+  if (err.code === "23503") {
+    return res.status(404).json({ error: "Ressource liée introuvable (clé étrangère inexistante)." });
+  }
+
+  const statusCode = err.status || 500;
+  res.status(statusCode).json({ error: err.message || "Erreur interne du serveur" });
 });
 
-// app.use((err, req, res, suite) => {
-//   console.error(err);
-//   res.status(500).json({ erreur: 'Erreur interne du serveur' });
-// });
+app.listen(3000, () => {
+  console.log(`🚀 Serveur express démarré sur http://localhost:3000`);
+});

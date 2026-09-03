@@ -8,23 +8,36 @@ const statsRouter = Router();
 // --------------------------------------------------
 
 // Trois indicateurs : objets par statut, poids total reçu, poids détourné de la déchetterie
-statsRouter.get("/", async (req, res) => {
+// IA pour cette route
+statsRouter.get("/", async (req, res, next) => {
     try {
-        const result = await pool.query(`
-          SELECT
-            statut,
-            COUNT(*)::integer AS nombre_objets,
-            COALESCE(SUM(poids_kg), 0)::float AS poids_total_kg
-          FROM objet
-          GROUP BY statut;
+        // 1. Répartition par statut
+        const statsParStatut = await pool.query(`
+            SELECT statut, COUNT(*)::integer AS nombre_objets
+            FROM objet
+            GROUP BY statut;
         `);
-        // IA pour cette requête 
 
-        res.json(result.rows);
+        // 2. Totaux de poids global et détourné
+        const totauxPoids = await pool.query(`
+            SELECT
+              COALESCE(SUM(poids_kg), 0)::float AS poids_total_recu_kg,
+              COALESCE(
+                SUM(poids_kg) FILTER (WHERE statut IN ('vendu', 'en_rayon', 'recycle')), 
+                0
+              )::float AS poids_detourne_kg
+            FROM objet;
+        `);
+
+        // Combinaison des résultats dans la réponse JSON
+        res.json({
+          objets_par_statut: statsParStatut.rows,
+          poids_total_recu_kg: totauxPoids.rows[0].poids_total_recu_kg,
+          poids_detourne_kg: totauxPoids.rows[0].poids_detourne_kg
+        });
 
     } catch (err) {
-        console.error("Erreur GET /api/stats :", err.message);
-        res.status(500).json({ error: err.message });
+        next(err);
     }
 });
 

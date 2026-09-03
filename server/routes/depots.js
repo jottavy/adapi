@@ -31,8 +31,7 @@ depotsRouter.get("/:id", async (req, res) => {
         res.json(result.rows); // besoin de préciser qu'on veut seulement result.rows[0] ?
 
         } catch (err) {
-            console.error("Erreur GET api/depots/:id : ", err.message)
-            res.status(500).json({ error: err.message })
+            next(err);
         }
 });
 
@@ -58,8 +57,7 @@ depotsRouter.post("/", async (req, res) => {
         res.status(201).json(result.rows[0]);
   
     } catch (err) {
-        console.error("Erreur POST /api/depots :", err.message);
-        res.status(500).json({ error: err.message });
+        next(err);
     }
 });
 
@@ -87,11 +85,7 @@ depotsRouter.post("/:id/objets", async (req, res) => {
         res.status(201).json(result.rows[0]);
   
     } catch (err) {
-        if (err.code === "23503") {
-            return res.status(404).json({ error: "Le dépôt n'existe pas." });
-        }
-        console.error("Erreur POST /api/depots/:id/objets :", err.message);
-        res.status(500).json({ error: err.message });
+        next(err);
     }
 });
 

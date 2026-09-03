@@ -40,8 +40,7 @@ objetsRouter.get("/", async (req, res) => {
         res.json(result.rows);
 
         } catch (err) {
-            console.error("Erreur GET api/objets : ", err.message)
-            res.status(500).json({ error: err.message })
+            next(err);
         }
 });
 
@@ -71,8 +70,7 @@ objetsRouter.get("/:id", async (req, res) => {
         res.json(result.rows[0]);
 
         } catch (err) {
-            console.error("Erreur GET api/objets/:id : ", err.message)
-            res.status(500).json({ error: err.message })
+            next(err);
         }
 });
 
@@ -107,8 +105,7 @@ objetsRouter.patch("/:id/statut", async (req, res) => {
         res.json(result.rows[0]);
 
         } catch (err) {
-            console.error("Erreur GET api/objets/:id/statut : ", err.message)
-            res.status(500).json({ error: err.message })
+            next(err);
         }
 });
 

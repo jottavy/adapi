@@ -18,7 +18,7 @@ pool.on('connect', () => {
 });
 
 pool.on('error', (err) => {
-  console.error('❌ Erreur inattendue du pool PostgreSQL :', err);
+  console.error('❌ Erreur du pool PostgreSQL :', err);
 });
 
 export default pool;
