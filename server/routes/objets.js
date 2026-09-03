@@ -50,7 +50,8 @@ objetsRouter.get("/:id", async (req, res) => {
     try {
         const result = await pool.query(`
           SELECT
-          objet.*,
+          objet.id,
+          objet.libelle,
           categorie.libelle AS categorie_libelle,
           depot.type AS depot_type,
           personne.nom AS personne_nom,
@@ -71,6 +72,42 @@ objetsRouter.get("/:id", async (req, res) => {
 
         } catch (err) {
             console.error("Erreur GET api/objets/:id : ", err.message)
+            res.status(500).json({ error: err.message })
+        }
+});
+
+// --------------------------------------------------
+// PATCH
+// --------------------------------------------------
+
+// Fait évoluer le statut d’un objet — statut, prix?
+objetsRouter.patch("/:id/statut", async (req, res) => {
+    const { statut, prix } = req.body;
+    const id = req.params.id;
+    const statuts = ["arrive", "en_reparation", "en_rayon", "vendu", "recycle"];
+
+    if (!statut|| !prix) {
+        return res.status(400).json({ error: "Le statut et le prix sont obligatoires." });
+    }
+
+    try {
+        const result = await pool.query(`
+            UPDATE objet
+            SET statut = $2::statut_objet, prix = COALESCE($3, prix)
+            WHERE id = $1
+            RETURNING *;
+          `, [id, statut, prix ?? null]
+        );
+
+        if (!result.rows[0]) {
+            return res.status(404).json({ error: "Objet non trouvé." });
+        }
+
+        console.log(`Objet id: ${id} modifié avec succès`);
+        res.json(result.rows[0]);
+
+        } catch (err) {
+            console.error("Erreur GET api/objets/:id/statut : ", err.message)
             res.status(500).json({ error: err.message })
         }
 });

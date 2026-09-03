@@ -10,6 +10,12 @@
       "get": {
         "summary": "Liste tous les objets",
         "responses": {
+          "200": { "description": "" }
+        }
+      },
+       "get": {
+        "summary": "Liste tous les objets",
+        "responses": {
           "200": { "description": "La liste des objets" }
         }
       }

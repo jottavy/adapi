@@ -36,5 +36,63 @@ depotsRouter.get("/:id", async (req, res) => {
         }
 });
 
+// --------------------------------------------------
+// POST
+// --------------------------------------------------
+
+// Enregistre un dépôt — personne_id, date_depot, type
+depotsRouter.post("/", async (req, res) => {
+    const { personne_id, date_depot, type } = req.body;
+
+    if (!personne_id || !type) {
+        return res.status(400).json({ error: "L'identifiant de la personne et le type sont obligatoires." });
+    }
+
+    try {
+        const result = await pool.query(`
+            INSERT INTO depot (personne_id, date_depot, type)
+            VALUES ($1, $2, $3)
+            RETURNING *;
+        `, [personne_id, date_depot || new Date(), type]);
+
+        res.status(201).json(result.rows[0]);
+  
+    } catch (err) {
+        console.error("Erreur POST /api/depots :", err.message);
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Ajoute un objet au dépôt — libelle, poids_kg, etat_arrivee, categorie_id
+depotsRouter.post("/:id/objets", async (req, res) => {
+    const { libelle, poids_kg, etat_arrivee, categorie_id } = req.body;
+    const depot_id = req.params.id;
+    const etats = ["bon_etat", "a_reparer", "hors_service"];
+
+    if (!libelle || !categorie_id) {
+        return res.status(400).json({ error: "Le libellé et la categorie sont obligatoires." });
+    }
+
+    if (etat_arrivee && !etats.includes(etat_arrivee)) {
+        return res.status(400).json({ error: `L'état d'arrivée doit être l'un des suivants : ${etats.join(', ')}` });
+    }
+
+    try {
+        const result = await pool.query(`
+            INSERT INTO objet (libelle, poids_kg, etat_arrivee, categorie_id, depot_id)
+            VALUES ($1, $2, $3, $4, $5)
+            RETURNING *;
+        `, [libelle, poids_kg || null, etat_arrivee || null, categorie_id, depot_id]);
+
+        res.status(201).json(result.rows[0]);
+  
+    } catch (err) {
+        if (err.code === "23503") {
+            return res.status(404).json({ error: "Le dépôt n'existe pas." });
+        }
+        console.error("Erreur POST /api/depots/:id/objets :", err.message);
+        res.status(500).json({ error: err.message });
+    }
+});
 
 export default depotsRouter;

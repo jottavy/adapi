@@ -28,24 +28,24 @@ personnesRouter.get("/", async (req, res) => {
 // --------------------------------------------------
 
 // Crée une donatrice — nom, prenom, telephone?, adherente?
-categoriesRouter.post("/", async (req, res) => {
+personnesRouter.post("/", async (req, res) => {
     const { nom, prenom, telephone, adherente } = req.body;
 
-    if () {
-        return res.status(400).json({ error: "Le libellé n'existe pas." });
+    if (!nom || !prenom) {
+        return res.status(400).json({ error: "Le nom est le prénom sont obligatoires." });
     }
 
     try {
         const result = await pool.query(`
-            INSERT INTO categorie (libelle)
-            VALUES ($1)
+            INSERT INTO personne (nom, prenom, telephone, adherente)
+            VALUES ($1, $2, $3, $4)
             RETURNING *;
-        `, [libelle]);
+        `, [nom, prenom, telephone || null, adherente ?? false ]);
 
         res.status(201).json(result.rows[0]);
   
     } catch (err) {
-        console.error("Erreur POST /api/categories :", err.message);
+        console.error("Erreur POST /api/personnes :", err.message);
         res.status(500).json({ error: err.message });
     }
 });
