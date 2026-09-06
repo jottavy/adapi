@@ -13,9 +13,11 @@ API REST de gestion pour **La Remise**, un magasin de seconde main et centre de 
 
 ## Installation
 
+```bash
 git clone <url-du-depot>
 cd adapi
 npm install
+```
 
 Configurer les variables d'environnement :
 
