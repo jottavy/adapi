@@ -102,21 +102,35 @@ Content-Type: application/json
 #   PATCH
 # ---------------------------------------------
 
-### 200 - Fait évoluer le statut d’un objet — statut, prix
+### 200 - Fait évoluer le statut d'un objet — statut + prix
 PATCH http://localhost:3000/api/objets/7/statut
 Content-Type: application/json
 
 {
   "statut": "en_rayon",
-  "prix": 15
+  "prix": 20
 }
 
-### 400 - Staut ou prix non renseigné
+### 200 - Change le statut sans prix — prix optionnel, l'ancien est conservé
 PATCH http://localhost:3000/api/objets/7/statut
 Content-Type: application/json
 
 {
   "statut": "en_rayon"
+}
+
+### 400 - Statut non renseigné
+PATCH http://localhost:3000/api/objets/7/statut
+Content-Type: application/json
+
+{}
+
+### 400 - Statut invalide (n'appartient pas à l'enum statut_objet)
+PATCH http://localhost:3000/api/objets/7/statut
+Content-Type: application/json
+
+{
+  "statut": "en_vente"
 }
 
 ### 404 - L'objet n'existe pas
