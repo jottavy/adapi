@@ -47,7 +47,7 @@ cd ..
 
 ### 2. Initialiser la base
 
-Appliquer les migrations et le jeu de données de test :
+Appliquer les migrations et le jeu de données :
 
 ```bash
 psql -h localhost -p 5432 -U username -d database -f db/migration_up.sql
@@ -60,7 +60,7 @@ psql -h localhost -p 5432 -U username -d database -f db/seed.sql
 npm start
 ```
 
-Le serveur démarre sur `http://localhost:3000`.
+Le serveur démarre sur `http://localhost:3001`.
 
 ## Base de données
 
@@ -127,7 +127,7 @@ Le serveur démarre sur `http://localhost:3000`.
 
 ## Documentation Swagger
 
-Disponible sur `http://localhost:3000/api-docs` dès que le serveur est démarré.
+Disponible sur `http://localhost:3001/api-docs` dès que le serveur est démarré.
 
 ## Structure du projet
 
