@@ -138,7 +138,6 @@ adapi/
 │   ├── migration_up.sql      # Création des tables
 │   ├── migration_down.sql    # Suppression des tables
 │   ├── seed.sql              # Jeu de données de test
-│   └── queries.sql           # Requêtes SQL diverses
 ├── server/
 │   ├── index.js              # Point d'entrée Express
 │   ├── db.js                 # Connexion PostgreSQL (pool)
