@@ -22,7 +22,7 @@ app.use('/api/personnes', personnesRouter);
 app.use('/api/stats', statsRouter);
 
 app.use((err, req, res, next) => {
-  console.error("Erreur centralisée :", err.stack);
+  console.error("Erreur centralisée :", err.stack); // pour debugger : renvoie une chaîne de caractères qui décrit le chemin d'exécution depuis le point où l'erreur a été levée jusqu'à sa capture
 
   if (err.code === "23503") {
     return res.status(404).json({ error: "Ressource liée introuvable (clé étrangère inexistante)." });
