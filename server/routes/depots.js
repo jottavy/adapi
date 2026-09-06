@@ -8,7 +8,7 @@ const depotsRouter = Router();
 // --------------------------------------------------
 
 // Un dépôt, sa donatrice, et la liste des objets qu’il contient
-depotsRouter.get("/:id", async (req, res) => {
+depotsRouter.get("/:id", async (req, res, next) => {
     try {
         const result = await pool.query(`
             SELECT
@@ -40,7 +40,7 @@ depotsRouter.get("/:id", async (req, res) => {
 // --------------------------------------------------
 
 // Enregistre un dépôt — personne_id, date_depot, type
-depotsRouter.post("/", async (req, res) => {
+depotsRouter.post("/", async (req, res, next) => {
     const { personne_id, date_depot, type } = req.body;
 
     if (!personne_id || !type) {
@@ -62,7 +62,7 @@ depotsRouter.post("/", async (req, res) => {
 });
 
 // Ajoute un objet au dépôt — libelle, poids_kg, etat_arrivee, categorie_id
-depotsRouter.post("/:id/objets", async (req, res) => {
+depotsRouter.post("/:id/objets", async (req, res, next) => {
     const { libelle, poids_kg, etat_arrivee, categorie_id } = req.body;
     const depot_id = req.params.id;
     const etats = ["bon_etat", "a_reparer", "hors_service"];

@@ -24,7 +24,7 @@ const objetsRouter = Router();
 // });
 
 // La même liste, filtrée — les deux filtres sont optionnels et cumulables
-objetsRouter.get("/", async (req, res) => {
+objetsRouter.get("/", async (req, res, next) => {
     try {
         const result = await pool.query(`
           SELECT
@@ -45,7 +45,7 @@ objetsRouter.get("/", async (req, res) => {
 });
 
 // Un objet, sa catégorie, son dépôt et le nom de sa donatrice
-objetsRouter.get("/:id", async (req, res) => {
+objetsRouter.get("/:id", async (req, res, next) => {
     try {
         const result = await pool.query(`
           SELECT
@@ -79,13 +79,17 @@ objetsRouter.get("/:id", async (req, res) => {
 // --------------------------------------------------
 
 // Fait évoluer le statut d’un objet — statut, prix?
-objetsRouter.patch("/:id/statut", async (req, res) => {
+objetsRouter.patch("/:id/statut", async (req, res, next) => {
     const { statut, prix } = req.body;
     const id = req.params.id;
     const statuts = ["arrive", "en_reparation", "en_rayon", "vendu", "recycle"];
 
-    if (!statut|| !prix) {
-        return res.status(400).json({ error: "Le statut et le prix sont obligatoires." });
+    if (!statut) {
+        return res.status(400).json({ error: "Le statut est obligatoire." });
+    }
+
+    if (!statuts.includes(statut)) {
+        return res.status(400).json({ error: `Le statut doit être l'un des suivants : ${statuts.join(', ')}` });
     }
 
     try {
@@ -94,7 +98,7 @@ objetsRouter.patch("/:id/statut", async (req, res) => {
             SET statut = $2::statut_objet, prix = COALESCE($3, prix)
             WHERE id = $1
             RETURNING *;
-          `, [id, statut, prix ?? null]
+          `, [id, statut, prix ?? null] // Prix est optionnel, on garde l'ancien si pas de nouvelle valeur
         );
 
         if (!result.rows[0]) {

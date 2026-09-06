@@ -8,7 +8,7 @@ const categoriesRouter = Router();
 // --------------------------------------------------
 
 // Toutes les catégories — id et libelle
-categoriesRouter.get("/", async (req, res) => {
+categoriesRouter.get("/", async (req, res, next) => {
     try {
         const result = await pool.query(`
             SELECT * FROM categorie ORDER BY id ASC;
