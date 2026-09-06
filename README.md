@@ -4,25 +4,18 @@ API REST de gestion pour **La Remise**, un magasin de seconde main et centre de 
 
 ## Stack technique
 
-- **Runtime** : Node.js (ES Modules)
-- **Framework** : Express 5
-- **Base de données** : PostgreSQL 16 (via Docker)
-- **Client DB** : pg (node-postgres)
-- **Documentation** : Swagger UI (`swagger-ui-express`)
-- **Dev** : Nodemon
-
-## Prérequis
-
-- [Node.js](https://nodejs.org/) >= 18
-- [Docker](https://www.docker.com/) & Docker Compose
+- Node.js (ES Modules)
+- Express 5
+- PostgreSQL 16 (via Docker)
+- pg (node-postgres)
+- Swagger UI
+- Nodemon
 
 ## Installation
 
-```bash
 git clone <url-du-depot>
 cd adapi
 npm install
-```
 
 Configurer les variables d'environnement :
 
@@ -34,10 +27,10 @@ Modifier `.env` avec vos accès PostgreSQL :
 
 ```
 DB_HOST=localhost
-DB_PORT=5433
-DB_USER=laremise
-DB_PASSWORD=laremise
-DB_DATABASE=laremise_db
+DB_PORT=5432
+DB_USER=username
+DB_PASSWORD=password
+DB_DATABASE=database
 ```
 
 ## Lancement
@@ -55,8 +48,8 @@ cd ..
 Appliquer les migrations et le jeu de données de test :
 
 ```bash
-psql -h localhost -p 5433 -U laremise -d laremise_db -f db/migration_up.sql
-psql -h localhost -p 5433 -U laremise -d laremise_db -f db/seed.sql
+psql -h localhost -p 5432 -U username -d database -f db/migration_up.sql
+psql -h localhost -p 5432 -U username -d database -f db/seed.sql
 ```
 
 ### 3. Démarrer le serveur
@@ -71,19 +64,19 @@ Le serveur démarre sur `http://localhost:3000`.
 
 ### Tables
 
-| Table | Description |
-|---|---|
-| `personne` | Donatrices et acheteuses |
-| `benevole` | Bénévoles du magasin |
-| `competence` | Compétences des bénévoles |
-| `categorie` | Catégories d'objets |
-| `vente` | Ventes réalisées |
-| `depot` | Dépôts d'objets (boutique ou domicile) |
-| `atelier` | Ateliers de réparation/formation |
-| `benevole_competence` | Association bénévole ↔ compétence |
-| `objet` | Objets déposés, en réparation, en rayon, vendus ou recyclés |
-| `inscription` | Inscriptions aux ateliers |
-| `reparation` | Réparations effectuées sur les objets |
+| Table                 | Description                                                 |
+| --------------------- | ----------------------------------------------------------- |
+| `personne`            | Donatrices et acheteuses                                    |
+| `benevole`            | Bénévoles du magasin                                        |
+| `competence`          | Compétences des bénévoles                                   |
+| `categorie`           | Catégories d'objets                                         |
+| `vente`               | Ventes réalisées                                            |
+| `depot`               | Dépôts d'objets (boutique ou domicile)                      |
+| `atelier`             | Ateliers de réparation/formation                            |
+| `benevole_competence` | Association bénévole ↔ compétence                           |
+| `objet`               | Objets déposés, en réparation, en rayon, vendus ou recyclés |
+| `inscription`         | Inscriptions aux ateliers                                   |
+| `reparation`          | Réparations effectuées sur les objets                       |
 
 ### Énumérations
 
@@ -97,38 +90,38 @@ Le serveur démarre sur `http://localhost:3000`.
 
 ### Catégories
 
-| Méthode | Chemin | Description |
-|---|---|---|
-| `GET` | `/api/categories` | Liste toutes les catégories |
+| Méthode | Chemin            | Description                 |
+| ------- | ----------------- | --------------------------- |
+| `GET`   | `/api/categories` | Liste toutes les catégories |
 
 ### Objets
 
-| Méthode | Chemin | Description |
-|---|---|---|
-| `GET` | `/api/objets` | Liste les objets (filtres optionnels : `statut`, `categorie_id`) |
-| `GET` | `/api/objets/:id` | Détails d'un objet (catégorie, dépôt, donatrice) |
-| `PATCH` | `/api/objets/:id/statut` | Met à jour le statut et le prix d'un objet |
+| Méthode | Chemin                   | Description                                                      |
+| ------- | ------------------------ | ---------------------------------------------------------------- |
+| `GET`   | `/api/objets`            | Liste les objets (filtres optionnels : `statut`, `categorie_id`) |
+| `GET`   | `/api/objets/:id`        | Détails d'un objet (catégorie, dépôt, donatrice)                 |
+| `PATCH` | `/api/objets/:id/statut` | Met à jour le statut et le prix d'un objet                       |
 
 ### Personnes
 
-| Méthode | Chemin | Description |
-|---|---|---|
-| `GET` | `/api/personnes` | Liste toutes les personnes |
-| `POST` | `/api/personnes` | Crée une personne (champs : `nom`, `prenom`, `telephone?`, `adherente?`) |
+| Méthode | Chemin           | Description                                                              |
+| ------- | ---------------- | ------------------------------------------------------------------------ |
+| `GET`   | `/api/personnes` | Liste toutes les personnes                                               |
+| `POST`  | `/api/personnes` | Crée une personne (champs : `nom`, `prenom`, `telephone?`, `adherente?`) |
 
 ### Dépôts
 
-| Méthode | Chemin | Description |
-|---|---|---|
-| `GET` | `/api/depots/:id` | Détails d'un dépôt avec donatrice et objets |
-| `POST` | `/api/depots` | Enregistre un dépôt (champs : `personne_id`, `type`, `date_depot?`) |
-| `POST` | `/api/depots/:id/objets` | Ajoute un objet à un dépôt |
+| Méthode | Chemin                   | Description                                                         |
+| ------- | ------------------------ | ------------------------------------------------------------------- |
+| `GET`   | `/api/depots/:id`        | Détails d'un dépôt avec donatrice et objets                         |
+| `POST`  | `/api/depots`            | Enregistre un dépôt (champs : `personne_id`, `type`, `date_depot?`) |
+| `POST`  | `/api/depots/:id/objets` | Ajoute un objet à un dépôt                                          |
 
 ### Statistiques
 
-| Méthode | Chemin | Description |
-|---|---|---|
-| `GET` | `/api/stats` | Répartition des objets par statut, poids total reçu et détourné |
+| Méthode | Chemin       | Description                                                     |
+| ------- | ------------ | --------------------------------------------------------------- |
+| `GET`   | `/api/stats` | Répartition des objets par statut, poids total reçu et détourné |
 
 ## Documentation Swagger
 
@@ -154,7 +147,6 @@ adapi/
 │       ├── depots.js         # Routes /api/depots
 │       ├── personnes.js      # Routes /api/personnes
 │       └── stats.js          # Routes /api/stats
-├── front-test/               # Interface de test front-end
 ├── conception/
 │   └── MLD.md                # Modèle Logique de Données
 ├── .env.example              # Variables d'environnement (modèle)
